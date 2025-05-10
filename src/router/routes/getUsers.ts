@@ -1,13 +1,9 @@
 import { ServerResponse } from 'http';
 import USERS from '../../db/db';
+import sendData from '../../utils/sendData';
 
 const getUsers = async (res: ServerResponse) => {
-  const data = JSON.stringify(USERS);
-  res.writeHead(200, {
-    'Content-Type': 'application/json',
-    'Content-Length': Buffer.byteLength(data),
-  });
-  res.end(data);
+  sendData(USERS, res, 200);
 };
 
 export default getUsers;
