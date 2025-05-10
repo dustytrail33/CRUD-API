@@ -6,11 +6,11 @@ import { validate } from 'uuid';
 const getUser = (res: ServerResponse, userId: string) => {
   if (!validate(userId)) return sendData({ error: 'Invalid userId' }, res, 400);
 
-  const foundedUser = USERS.find((user) => user.id === userId);
+  const foundUser = USERS.find((user) => user.id === userId);
 
-  if (!foundedUser) return sendData({ error: 'User not found' }, res, 404);
+  if (!foundUser) return sendData({ error: 'User not found' }, res, 404);
 
-  return sendData(foundedUser, res, 200);
+  return sendData(foundUser, res, 200);
 };
 
 export default getUser;
