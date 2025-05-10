@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
+import { IUser } from '../types';
 
-const USERS = [
+const USERS: IUser[] = [
   { id: uuidv4(), username: 'Alice', age: 25, hobbies: ['reading', 'traveling'] },
   { id: uuidv4(), username: 'Bob', age: 30, hobbies: ['singing'] },
   { id: uuidv4(), username: 'Charlie', age: 22, hobbies: ['gaming', 'coding'] },
