@@ -1,5 +1,24 @@
-import { sum } from './utils/sum';
+import http from 'http';
+import * as dotenv from 'dotenv';
+import router from './router';
 
-console.log('Hello CRUD API');
+dotenv.config();
 
-console.log('sum', sum(2, 4));
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
+
+if (isNaN(PORT) || PORT <= 0) {
+  console.log('Wrong port in .env');
+  process.exit(1);
+}
+
+const server = http.createServer(async (req, res) => {
+  try {
+    await router(req, res);
+  } catch {
+    console.log('Error');
+  }
+});
+
+server.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
