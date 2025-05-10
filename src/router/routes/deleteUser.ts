@@ -10,13 +10,9 @@ const deleteUser = async (res: ServerResponse, userId: string) => {
 
   if (!foundUser) return sendData({ error: 'User not found' }, res, 404);
 
-  try {
-    const userIndex = USERS.indexOf(foundUser);
-    USERS.splice(userIndex, 1);
-    return sendData(null, res, 204);
-  } catch {
-    return sendData({ error: 'Invalid Data' }, res, 400);
-  }
+  const userIndex = USERS.indexOf(foundUser);
+  USERS.splice(userIndex, 1);
+  return sendData(null, res, 204);
 };
 
 export default deleteUser;

@@ -1,6 +1,7 @@
 import http from 'http';
 import * as dotenv from 'dotenv';
 import router from './router';
+import { handleError } from './utils/handleError';
 
 dotenv.config();
 
@@ -14,8 +15,8 @@ if (isNaN(PORT) || PORT <= 0) {
 const server = http.createServer(async (req, res) => {
   try {
     await router(req, res);
-  } catch {
-    console.log('Error');
+  } catch (err) {
+    handleError(res, err);
   }
 });
 
