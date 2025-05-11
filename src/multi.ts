@@ -16,7 +16,6 @@ const workerCount = Math.max(totalCpus - 1, 1);
 const workerPorts: number[] = [];
 
 if (cluster.isPrimary) {
-  //start dbServer
   const dbScript = path.resolve(__dirname, 'dbServer.js');
   const dbProc = fork(dbScript, { env: { ...process.env, PORT: String(DB_PORT) } });
   dbProc.on('exit', (code) => console.log(`DB server exited with code ${code}`));
@@ -29,12 +28,12 @@ if (cluster.isPrimary) {
     workerPorts.push(port);
     portsMap.set(worker.id, port);
   }
-  console.log(`Created ${workerCount} workers on ports`, workerPorts);
-
+  
   let current = 0;
+
   const balancer = http.createServer((req, res) => {
     const targetPort = workerPorts[current];
-    console.log(`Balancer: proxying ${req.method} ${req.url} → port:${targetPort}`);
+    console.log(`Proxying ${req.method} ${req.url} → port:${targetPort}`);
     current = (current + 1) % workerPorts.length;
 
     const proxy = request(
@@ -59,7 +58,7 @@ if (cluster.isPrimary) {
     console.warn(`Worker ${worker.id} on port ${port} died, restarting…`);
     portsMap.delete(worker.id);
     if (port) {
-      const newWorker = cluster.fork({ CLUSTER_PORT: port.toString(), PORT: process.env.PORT });
+      const newWorker = cluster.fork({ CLUSTER_PORT: port.toString() });
       portsMap.set(newWorker.id, port);
     }
   });

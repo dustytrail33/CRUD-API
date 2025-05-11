@@ -2,7 +2,7 @@ import http, { request } from 'http';
 
 const DB_PORT = Number(process.env.DB_PORT);
 if (isNaN(DB_PORT) || DB_PORT <= 0) {
-  console.error('Worker: invalid DB_PORT');
+  console.error('Worker: invalid data base port');
   process.exit(1);
 }
 
