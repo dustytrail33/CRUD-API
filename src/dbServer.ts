@@ -5,10 +5,10 @@ import { handleError } from './utils/handleError';
 
 dotenv.config();
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
+const PORT = Number(process.env.DB_PORT) || Number(process.env.PORT) || 3000;
 
 if (isNaN(PORT) || PORT <= 0) {
-  console.log('Wrong port in .env');
+  console.log('Wrong port');
   process.exit(1);
 }
 
@@ -21,5 +21,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+  console.log(`DB Server listening on port ${PORT}`);
 });

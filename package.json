@@ -6,8 +6,9 @@
     "node": ">=22.14.0"
   },
   "scripts": {
-    "start:dev": "nodemon src/index.ts",
-    "start:prod": "npm run build && node dist/index.js",
+    "start:dev": "nodemon src/dbServer.ts",
+    "start:prod": "npm run build && node dist/dbServer.js",
+    "start:multi": "npm run build && cross-env DB_PORT=5000 node dist/multi.js",
     "build": "npm run lint && npm run test && webpack --mode production",
     "lint": "eslint \"src/**/*.{ts,js}\"",
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
@@ -40,6 +41,7 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
+    "cross-env": "^7.0.3",
     "uuid": "^11.1.0"
   }
 }

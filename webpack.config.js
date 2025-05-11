@@ -4,11 +4,14 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default {
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-  entry: './src/index.ts',
+  mode: 'production',
+  entry: {
+    dbServer: './src/dbServer.ts',
+    multi: './src/multi.ts',
+  },
   target: 'node',
   output: {
-    filename: 'index.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
     clean: true,
   },

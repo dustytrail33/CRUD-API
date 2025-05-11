@@ -11,7 +11,7 @@ const router = async (req: IncomingMessage, res: ServerResponse) => {
   const url = req.url ? parse(req.url, true) : parse('', true);
   const method = req.method;
   const matchId = url.pathname?.match(/^\/users\/(.+)$/);
-  console.log(url.pathname);
+  
   if (url.pathname === '/users' && method === 'GET') {
     return await getUsers(res);
   }
