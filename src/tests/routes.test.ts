@@ -4,9 +4,10 @@ import createUser from '../router/routes/createUser';
 import USERS from '../db/db';
 import changeUser from '../router/routes/changeUser';
 import deleteUser from '../router/routes/deleteUser';
+import getUser from '../router/routes/getUser';
 
 jest.mock('uuid', () => ({
-  validate: (id: string) => id === 'mocked-user-id',
+  validate: (id: string) => id === 'mocked-user-id' || id === 'not-exist-user',
   v4: () => 'mocked-user-id',
 }));
 
@@ -14,9 +15,9 @@ jest.mock('../db/db', () => {
   const USERS = [
     {
       id: 'mocked-user-id',
-      username: 'Test User',
+      username: 'Test',
       age: 99,
-      hobbies: ['testing'],
+      hobbies: ['test'],
     },
   ];
   return {
@@ -24,6 +25,12 @@ jest.mock('../db/db', () => {
     default: USERS,
   };
 });
+
+const testData = {
+  username: 'Test',
+  age: 100,
+  hobbies: ['test'],
+};
 
 describe('User routes unit test', () => {
   let mockRes: jest.Mocked<ServerResponse>;
@@ -53,41 +60,75 @@ describe('User routes unit test', () => {
     expect(mockRes.end).toHaveBeenCalledWith(JSON.stringify(USERS));
   });
 
+  test('Create user: should create a user and return 201', async () => {
+    mockJsonBody(testData);
+
+    await createUser(mockReq as IncomingMessage, mockRes as ServerResponse);
+
+    expect(USERS[USERS.length - 1]).toMatchObject({ id: 'mocked-user-id', ...testData });
+    expect(mockRes.writeHead).toHaveBeenCalledWith(201, { 'Content-Type': 'application/json' });
+    expect(mockRes.end).toHaveBeenCalledWith(JSON.stringify({ id: 'mocked-user-id', ...testData }));
+  });
+
   test('Create user: should return 400 if data is invalid', async () => {
-    mockJsonBody({ username: 'John' });
+    mockJsonBody({ username: 'Test' });
 
     await createUser(mockReq as IncomingMessage, mockRes as ServerResponse);
 
     expect(mockRes.writeHead).toHaveBeenCalledWith(400, { 'Content-Type': 'application/json' });
-    expect((mockRes.end as jest.Mock).mock.calls[0][0]).toContain('Invalid user data');
+    expect(mockRes.end).toHaveBeenCalledWith(expect.stringContaining('Invalid user data'));
   });
 
-  test('Create user: should create a user and return 201', async () => {
-    const userData = {
-      username: 'Test',
-      age: 100,
-      hobbies: ['test'],
-    };
-    mockJsonBody(userData);
+  test('Get user: should return a user by id', async () => {
+    await getUser(mockRes, 'mocked-user-id');
+    expect(mockRes.writeHead).toHaveBeenCalledWith(200, { 'Content-Type': 'application/json' });
+    expect(mockRes.end).toHaveBeenCalledWith(JSON.stringify(USERS[0]));
+  });
 
-    await createUser(mockReq as IncomingMessage, mockRes as ServerResponse);
+  test('Get user: invalid UUID should return 400', async () => {
+    await getUser(mockRes, 'invalid-id');
+    expect(mockRes.writeHead).toHaveBeenCalledWith(400, { 'Content-Type': 'application/json' });
+    expect(mockRes.end).toHaveBeenCalledWith(expect.stringContaining('Invalid userId'));
+  });
 
-    expect(USERS[USERS.length - 1]).toMatchObject({ id: 'mocked-user-id', ...userData });
-    expect(mockRes.writeHead).toHaveBeenCalledWith(201, { 'Content-Type': 'application/json' });
-    expect(mockRes.end).toHaveBeenCalledWith(expect.stringContaining('Test'));
+  test('Get user: unknown user should return 404', async () => {
+    await getUser(mockRes, 'not-exist-user');
+    expect(mockRes.writeHead).toHaveBeenCalledWith(404, { 'Content-Type': 'application/json' });
+    expect(mockRes.end).toHaveBeenCalledWith(expect.stringContaining('User not found'));
   });
 
   test('Update user: should update a user', async () => {
-    const updatedData = { username: 'Test', age: 100, hobbies: ['test'] };
-    mockJsonBody(updatedData);
+    mockJsonBody(testData);
     await changeUser(mockReq as IncomingMessage, mockRes as ServerResponse, 'mocked-user-id');
     expect(mockRes.writeHead).toHaveBeenCalledWith(200, { 'Content-Type': 'application/json' });
     expect(mockRes.end).toHaveBeenCalledWith(expect.stringContaining('test'));
+  });
+
+  test('Update user: invalid UUID should return 400', async () => {
+    mockJsonBody(testData);
+    await changeUser(mockReq as IncomingMessage, mockRes, 'invalid-id');
+    expect(mockRes.writeHead).toHaveBeenCalledWith(400, { 'Content-Type': 'application/json' });
+  });
+
+  test('Update user: unknown user should return 404', async () => {
+    mockJsonBody(testData);
+    await changeUser(mockReq as IncomingMessage, mockRes, 'not-exist-user');
+    expect(mockRes.writeHead).toHaveBeenCalledWith(404, { 'Content-Type': 'application/json' });
   });
 
   test('Delete user: should delete a user', async () => {
     await deleteUser(mockRes, 'mocked-user-id');
     expect(mockRes.writeHead).toHaveBeenCalledWith(204);
     expect(mockRes.end).toHaveBeenCalled();
+  });
+
+  test('Delete user: invalid UUID should return 400', async () => {
+    await deleteUser(mockRes, 'invalid-id');
+    expect(mockRes.writeHead).toHaveBeenCalledWith(400, { 'Content-Type': 'application/json' });
+  });
+
+  test('Delete user:  unknown user should return 404', async () => {
+    await deleteUser(mockRes, 'not-exist-user');
+    expect(mockRes.writeHead).toHaveBeenCalledWith(404, { 'Content-Type': 'application/json' });
   });
 });
