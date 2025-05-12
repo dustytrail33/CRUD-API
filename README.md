@@ -1,9 +1,8 @@
 This is a simple REST API application built with Node.js that implements:
 
-- In-memory data storage  
-- HTTP request routing without external frameworks  
-- Clustering support (round-robin load balancing)  
 - Basic CRUD operations for user management  
+- Clustering support (round-robin load balancing)  
+- In-memory data storage  
 
 ---
 
