@@ -1,4 +1,4 @@
-This is a simple REST API application built with Node.js that implements:
+# This is a simple CRUD API
 
 - Basic CRUD operations for user management  
 - Clustering support (round-robin load balancing)  
